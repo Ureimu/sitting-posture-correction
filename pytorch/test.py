@@ -46,6 +46,9 @@ plt.show()
 
 with torch.no_grad():
     output_tensor = net(x)
+    pred_probab = nn.Softmax(dim=1)(output_tensor)
+    y_pred = pred_probab.argmax(1)
+    print(f"Predicted class: {y_pred}")
 
 print(output_tensor)
 
