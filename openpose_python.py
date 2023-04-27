@@ -31,7 +31,7 @@ try:
         "model_folder": rf"{openPose_path}\models",  # model位置
         "image_dir":    r"C:\Users\a1090\Documents\GitHub\openpose\examples\media\\",  # 输入目录
         "disable_blending": True,  # 在黑色背景上绘制骨骼坐标点。
-        "write_images": r"./openposeOutput",  # 输出目录
+        # "write_images": r"./openposeOutput",  # 输出目录
         "render_threshold": 0.001,  # 控制骨骼关节点最低置信度
         "number_people_max": 1,  # 识别人数
         "write_json": r"./openposeOutput/json",  # JSON输出目录
