@@ -5,7 +5,7 @@ import cv2
 import os
 from sys import platform
 
-#  安装openpose
+
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
     # os.path.dirname(os.path.realpath(__file__))
@@ -32,14 +32,24 @@ try:
         "image_dir":    r"C:\Users\a1090\Documents\GitHub\openpose\examples\media\\",  # 输入目录
         "disable_blending": True,  # 在黑色背景上绘制骨骼坐标点。
         "write_images": r"./openposeOutput",  # 输出目录
-        "render_threshold": 0.001, # 控制骨骼关节点最低置信度
-        "number_people_max": 1  # 识别人数
+        "render_threshold": 0.001,  # 控制骨骼关节点最低置信度
+        "number_people_max": 1,  # 识别人数
+        "write_json": r"./openposeOutput/json",  # JSON输出目录
+        "keypoint_scale": 3  # `3` to scale it in the range [0,1], where (0,0) would be the top-left corner of the
+        # image, and (1,1) the bottom-right one
+
     }
+
+    poseModel = op.PoseModel.BODY_25
+    print(op.getPoseBodyPartMapping(poseModel))
+    print(op.getPoseNumberBodyParts(poseModel))
+    print(op.getPosePartPairs(poseModel))
+    print(op.getPoseMapIndex(poseModel))
 
     # Starting OpenPose
     opWrapper = op.WrapperPython(op.ThreadManagerMode.Synchronous)
     opWrapper.configure(params)
-    opWrapper.execute()
+    # opWrapper.execute()
 except Exception as e:
     print(e)
     sys.exit(-1)
