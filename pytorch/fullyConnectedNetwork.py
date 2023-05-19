@@ -2,14 +2,15 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-import json
+import readData
+import numpy
 
 
 # 定义模型
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(10, 5)
+        self.fc1 = nn.Linear(19, 5)
         self.fc2 = nn.Linear(5, 2)
 
     def forward(self, netX):
@@ -23,8 +24,8 @@ losses = []
 
 net = Net()
 # 定义数据
-x = torch.randn(2, 10)
-y = torch.tensor([[0, 1], [1, 0]], dtype=torch.float)
+x = torch.tensor(data.readPoseData(), dtype=torch.float)
+y = torch.tensor(numpy.eye(5), dtype=torch.float)
 
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()

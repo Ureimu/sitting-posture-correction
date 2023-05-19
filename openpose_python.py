@@ -19,7 +19,7 @@ try:
             os.environ['PATH'] = os.environ['PATH'] + ';' + rf'{openPose_path}/build/x64/Release;' + rf'{openPose_path}/build/bin;'
             import pyopenpose as op
         else:
-            print("Error: not implemented on the other platform, stop importing")
+            print(f"Error: not implemented on the {platform} platform, stop importing")
     except ImportError as e:
         print(
             'Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python '
@@ -29,12 +29,12 @@ try:
     # Custom Params (refer to include/openpose/flags.hpp for more parameters)
     params = {
         "model_folder": rf"{openPose_path}\models",  # model位置
-        "image_dir":    r"C:\Users\a1090\Documents\GitHub\openpose\examples\media\\",  # 输入目录
+        "image_dir":    r"C:\Users\a1090\Documents\GitHub\sitting-posture-correction\pytorch\trainSet",  # 输入目录
         "disable_blending": True,  # 在黑色背景上绘制骨骼坐标点。
-        # "write_images": r"./openposeOutput",  # 输出目录
+        "write_images": r"./openposeOutput/train",  # 输出目录
         "render_threshold": 0.001,  # 控制骨骼关节点最低置信度
         "number_people_max": 1,  # 识别人数
-        "write_json": r"./openposeOutput/json",  # JSON输出目录
+        "write_json": r"./openposeOutput/train/json",  # JSON输出目录
         "keypoint_scale": 3  # `3` to scale it in the range [0,1], where (0,0) would be the top-left corner of the
         # image, and (1,1) the bottom-right one
 
@@ -49,7 +49,7 @@ try:
     # Starting OpenPose
     opWrapper = op.WrapperPython(op.ThreadManagerMode.Synchronous)
     opWrapper.configure(params)
-    # opWrapper.execute()
+    opWrapper.execute()
 except Exception as e:
     print(e)
     sys.exit(-1)
