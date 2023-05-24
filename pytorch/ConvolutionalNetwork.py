@@ -6,27 +6,24 @@ from matplotlib.ticker import FuncFormatter
 from readData import readData
 import numpy
 
-networkDepth = 4  # 网络深度
-networkSizeList = [75, 1000, 1800, 1200, 7]
-useExponent = False  # 是否使用指数参数控制
-exponent = 0.7  # 指数参数，控制网络每层的值是偏大还是偏小。
+networkDepth = 3  # 网络深度
 trainSetRate = 0.6  # 测试集占总数据集的比例
 outputTensorLength = 7  # 7分类问题。
-learning_rate = 5  # 学习率
-epochNum = 100000  # 训练轮数, 40000
+learning_rate = 5e-3  # 学习率
+epochNum = 10000  # 训练轮数
 # 每隔step_size个epoch，学习率 x gamma
 step_size = 50
 gamma = 1
 
-printAcc = True  # 是否打印acc参数
-epochReportPercentage = 0.001  # acc参数在每完成百分之多少的时候输出
-
+printAcc = False  # 是否打印acc参数
+epochReportPercentage = 0.01  # acc参数在每完成百分之多少的时候输出
+exponent = 1  # 指数参数，控制网络每层的值是偏大还是偏小。
 model_store_path = "./model"  # 模型存储路径
 
 trainMarkList, trainMatrix, trainPoseData, testMarkList, testMatrix, testPoseData, indexList = readData("./mark.txt",
                                                                                                         "../openposeOutput/train/json",
                                                                                                         trainSetRate,
-                                                                                                        True)
+                                                                                                        False)
 trainClassNumList = []
 testClassNumList = []
 for i in range(outputTensorLength):
@@ -43,32 +40,20 @@ print(f"poseLength:{singlePoseDataLength}, trainDataLength:{len(trainPoseData)},
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        startEndDelta = singlePoseDataLength - outputTensorLength
-        intervalList = []
-        if useExponent:
-            intervalList = [(i ** exponent) / (networkDepth ** exponent) for i in range(0, networkDepth + 1)]
-            intervalList.reverse()
-            print(
-                f"network size List: {[int(startEndDelta * intervalPercentage + outputTensorLength) for intervalPercentage in intervalList]}")
 
-        else:
-            intervalList = networkSizeList
-            print(
-                f"network size List: {intervalList}")
+        intervalList = [(i ** exponent) / (networkDepth ** exponent) for i in range(0, networkDepth + 1)]
+        intervalList.reverse()
+
+        startEndDelta = singlePoseDataLength - outputTensorLength
+        print(
+            f"network size List: {[int(startEndDelta * intervalPercentage + outputTensorLength) for intervalPercentage in intervalList]}")
 
         self.fcList = []
         for i in range(len(intervalList) - 1):
-            if useExponent:
-                intervalPercentage = intervalList[i]
-                nextPercentage = intervalList[i + 1]
-                self.fcList.append(nn.Linear(int(startEndDelta * intervalPercentage + outputTensorLength),
-                                             int(startEndDelta * nextPercentage + outputTensorLength)))
-            else:
-                intervalPercentage = intervalList[i]
-                nextPercentage = intervalList[i + 1]
-                self.fcList.append(nn.Linear(intervalPercentage,
-                                             nextPercentage))
-
+            intervalPercentage = intervalList[i]
+            nextPercentage = intervalList[i + 1]
+            self.fcList.append(nn.Linear(int(startEndDelta * intervalPercentage + outputTensorLength),
+                                         int(startEndDelta * nextPercentage + outputTensorLength)))
         self.lastFc = self.fcList.pop()
 
     def forward(self, netX):
@@ -160,8 +145,6 @@ def percentageFormatter(tmp, pos):
 ax2.yaxis.set_major_formatter(FuncFormatter(percentageFormatter))
 
 plt.show()
-
-fig.savefig('./chart/trainLossChart.png')
 
 # print(output_tensor)
 
