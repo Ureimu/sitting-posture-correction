@@ -12,6 +12,7 @@ import cv2
 import os
 from sys import platform
 
+from pytorch.predictFromPosDataList import predictResult
 
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -23,7 +24,8 @@ try:
         if platform == "win32":
             # Change these variables to point to the correct folder (Release/x64 etc.)
             sys.path.append(rf'{openPose_path}/build/python/openpose/Release')
-            os.environ['PATH'] = os.environ['PATH'] + ';' + rf'{openPose_path}/build/x64/Release;' + rf'{openPose_path}/build/bin;'
+            os.environ['PATH'] = os.environ[
+                                     'PATH'] + ';' + rf'{openPose_path}/build/x64/Release;' + rf'{openPose_path}/build/bin;'
             import pyopenpose as op
         else:
             print(f"Error: not implemented on the {platform} platform, stop importing")
@@ -36,7 +38,7 @@ try:
     # Custom Params (refer to include/openpose/flags.hpp for more parameters)
     params = {
         "model_folder": rf"{openPose_path}\models",  # model位置
-        "image_dir":    r"C:\Users\a1090\Documents\GitHub\sitting-posture-correction\pytorch\trainSet",  # 输入目录
+        "image_dir": r"C:\Users\a1090\Documents\GitHub\sitting-posture-correction\pytorch\trainSet",  # 输入目录
         "disable_blending": True,  # 在黑色背景上绘制骨骼坐标点。
         "write_images": r"./openposeOutput/train",  # 输出目录
         "render_threshold": 0.001,  # 控制骨骼关节点最低置信度
@@ -57,26 +59,11 @@ try:
     opWrapper = op.WrapperPython(op.ThreadManagerMode.Synchronous)
     opWrapper.configure(params)
     opWrapper.execute()
+
+
 except Exception as e:
     print(e)
     sys.exit(-1)
-
-
-def predict_result(datas=None):
-    """
-    :param datas: list
-    :return: int
-    """
-    if datas is None:
-        datas = []
-    model = Net()
-    model.load_state_dict(torch.load(
-        "../model_pth/23classification_eigenvalue.pth", map_location='cpu'))
-    predict = model(Variable(torch.Tensor([datas]).float())).detach().cpu().numpy().tolist()[0]
-    predict = predict.index(max(predict))
-
-    return predict
-
 
 if __name__ == '__main__':
     start = time.process_time()
@@ -85,7 +72,7 @@ if __name__ == '__main__':
             163115.3545813507, 0.4150879533697161, 0.9778420883296507, 0, 0, -0.8914324274471591, -0.2886839472216833,
             0, 0, 0, -0.6680837068163037, 0, 0, 0, 1.0, 0.5246781242226066]
     # print(predict_result(data))
-    predict_result(data)
+    predictResult(data)
 
     end = time.process_time()
     print(end - start)
