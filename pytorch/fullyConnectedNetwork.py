@@ -8,18 +8,18 @@ import numpy
 
 networkDepth = 4  # 网络深度
 # [75, 1000, 1800, 1200, 7]
-networkSizeList = [75, 100, 180, 120, 7]
+networkSizeList = [75, 1000, 1800, 1200, 7]
 useExponent = False  # 是否使用指数参数控制
 exponent = 0.7  # 指数参数，控制网络每层的值是偏大还是偏小。
 outputTensorLength = 7  # 7分类问题。
 learning_rate = 5  # 学习率
-epochNum = 40000  # 训练轮数, 40000
+epochNum = 100000  # 训练轮数, 40000
 # 每隔step_size个epoch，学习率 x gamma
 step_size = 50
 gamma = 1
 
 printAcc = True  # 是否打印acc参数
-epochReportPercentage = 0.1  # acc参数在每完成百分之多少的时候输出
+epochReportPercentage = 0.01  # acc参数在每完成百分之多少的时候输出
 
 model_store_path = "./model"  # 模型存储路径
 
@@ -97,11 +97,11 @@ if __name__ == '__main__':
     yTest = torch.tensor(testMatrix, dtype=torch.float)
     # print(y)
 
-    # maxClassNum = max(trainClassNumList)
-    # weights = torch.FloatTensor([maxClassNum / i for i in trainClassNumList])  # 类别权重，与样本数成反比
+    maxClassNum = max(trainClassNumList)
+    weights = torch.FloatTensor([maxClassNum / i for i in trainClassNumList])  # 类别权重，与样本数成反比
     # 定义损失函数和优化器
-    # criterion = nn.CrossEntropyLoss(weights)
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weights)
+    # criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 
     # 定义学习率更新。该方法是：每隔step_size个epoch，学习率 x gamma

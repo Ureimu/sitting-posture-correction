@@ -7,19 +7,16 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFrame
 
 from pytorch.predictFromPosDataList import predictResult
 
-# 使用qt designer设计ui。 位置在C:\Users\a1090\Documents\sitting-posture-correction-python-env\Lib\site-packages
-# \qt5_applications\Qt\bin\designer.exe
+# 使用qt designer设计ui。 位置在
+# C:\Users\a1090\Documents\sitting-posture-correction-python-env\Lib\site-packages\qt5_applications\Qt\bin\designer.exe
+# 使用如下命令编译ui文件： pyuic5 -o mainWindow.py mainWindow.ui
 # import neural network and ui data
 try:
-    #    from classification23_taichi_eigenvalue import *
     from mainWindow import *
-#    from data_process import *
-#    from predict_eigenvalue import *
 except ImportError as e:
     raise e
 
 # Import Openpose (Windows/Ubuntu/OSX)
-# os.path.dirname(os.path.realpath(__file__))
 # openPose的位置
 openPose_path = r"C:/Users/a1090/Documents/GitHub/openpose"
 try:
@@ -60,7 +57,7 @@ pos = ["无法识别的姿势",
        "正确的坐姿",
        "头部倾斜",
        "身体前倾",
-       "身体后倾",
+       "身体后仰",
        "身体右倾",
        "身体左倾"
        ]
@@ -70,7 +67,6 @@ class Video:
     def __init__(self, capture):
         self.capture = capture
         self.currentFrame = None
-        self.previousFrame = None
 
     def captureFrame(self):
         """
@@ -79,21 +75,12 @@ class Video:
         ret, readFrame = self.capture.read()
         return readFrame
 
-    def captureNextFrame(self):
-        """
-        capture frame and reverse RBG BGR and return opencv image
-        """
-        ret, readFrame = self.capture.read()
-        if ret:
-            self.currentFrame = cv2.cvtColor(readFrame, cv2.COLOR_BGR2RGB)
-
     def convertFrame(self):
         # converts frame to format suitable for QtGui
         try:
             height, width = self.currentFrame.shape[:2]
             img = QImage(self.currentFrame, width, height, QtGui.QImage.Format_RGB888)
             img = QPixmap.fromImage(img)
-            self.previousFrame = self.currentFrame
             return img
         except cv2.Error:
             return None
@@ -103,10 +90,10 @@ class mWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(mWindow, self).__init__()
         self.setupUi(self)
-
+        self.label_5.setPixmap(QPixmap("./imgs/坐姿说明.jpg"))
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.showCapture)
-        self.video = Video(cv2.VideoCapture(0))
+        self.video = Video(cv2.VideoCapture(0)) # 指定为默认摄像头
         self._timer.start(100)  # 每隔多长时间
 
 
@@ -149,6 +136,5 @@ class mWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainWindow = mWindow()
-    mainWindow.setStyleSheet("#MainWindow{border-image:url(../sundry/back5.png);}")
     mainWindow.show()
     sys.exit(app.exec_())

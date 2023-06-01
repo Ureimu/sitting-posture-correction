@@ -178,7 +178,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -192,7 +192,9 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:18pt;\">自动识别位于摄像头中的人体坐姿，并给出对应分类，错误坐姿会有相应提示，达到监督纠正错误坐姿的效果。</span></p></body></html>"))
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:18pt;\">    自动识别位于摄像头中的人体坐姿，并给出对应分类，错误坐姿会有相应提示，达到监督纠正错误坐姿的效果。</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:18pt;\">    姿态预估栏的右侧给出了所有坐姿分类以及其人体关键点示意图。</span></p></body></html>"))
         self.label_16.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt;\">更多内容请访问Github查看。</span><a href=\"https://github.com/Ureimu/sitting-posture-correction\"><span style=\" font-size:12pt; text-decoration: underline; color:#0000ff;\">Github代码库主页: sitting-posture-correction</span></a></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "使用说明"))
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-family:\'宋体\'; font-weight:600;\">基于机器视觉的学习不良坐姿矫正系统</span></p></body></html>"))
