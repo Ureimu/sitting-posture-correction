@@ -3,8 +3,8 @@ import sys
 import cv2
 from PyQt5.QtCore import QTimer, QCoreApplication
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFrame
-
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFrame, QFileDialog
+import time
 from pytorch.predictFromPosDataList import predictResult
 
 # 使用qt designer设计ui。 位置在
@@ -93,11 +93,13 @@ class mWindow(QMainWindow, Ui_MainWindow):
         self.label_5.setPixmap(QPixmap("./imgs/坐姿说明.jpg"))
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.showCapture)
-        self.video = Video(cv2.VideoCapture(0)) # 指定为默认摄像头
+        self.video = Video(cv2.VideoCapture(0))  # 指定为默认摄像头
         self._timer.start(100)  # 每隔多长时间
-
+        self.pushButton.clicked.connect(self.openImage)
 
     def showCapture(self):
+        if self.tabWidget.currentIndex() != 0:
+            return
         try:
 
             frame = self.video.captureFrame()
@@ -125,8 +127,52 @@ class mWindow(QMainWindow, Ui_MainWindow):
                 print(3.8)
                 keyPointsList = [keyPoints[0][i][j] for i in range(25) for j in range(3)]
             print(4)
-            resultTag=predictResult(keyPointsList)
+            resultTag = predictResult(keyPointsList)
             self.label_4.setText(pos[resultTag])
+            print(5)
+            print(pos[resultTag])
+        except TypeError as err:
+            print(f"type: {err}")
+
+    def openImage(self):
+        imgPath, imgType = QFileDialog.getOpenFileName(self, "打开图片", "", "*.jpg;;*.png;;All Files(*)")
+        print(imgPath, imgType)
+        jpg = QtGui.QPixmap(imgPath)
+        self.label_9.setPixmap(jpg)
+        self.predictFromImg(imgPath)
+
+    def predictFromImg(self, imgPath):
+        datum = op.Datum()
+        datum.cvInputData = cv2.imread(imgPath)  # 输入
+        try:
+            # print(frame)
+            print(1)
+            opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+            print(2)
+            if datum.poseKeypoints is None:
+                print("no body")
+                self.label_13.setText("未识别到人体")
+                jpg = QtGui.QPixmap(imgPath)
+                self.label_10.setPixmap(jpg)
+                return
+            time_tuple = time.localtime(time.time())
+            cv2.imwrite("./estimatedImgs/{}-{}-{}-{}-{}-{}.jpg".format(time_tuple[0], time_tuple[1], time_tuple[2], time_tuple[3],
+                                                            time_tuple[4], time_tuple[5]), datum.cvOutputData)
+            # cv2.putText(resPic, "OpenPose", (25, 25),
+            #             cv2.FONT_HERSHEY_COMPLEX, 1.0, (0, 0, 222))
+            print(2.5)
+            bone_img = datum.cvOutputData
+            height, width, channel = bone_img.shape
+            pixmap = QPixmap.fromImage(QImage(
+                bone_img.data, width, height, 3 * width, QImage.Format_RGB888).rgbSwapped())
+            self.label_10.setPixmap(pixmap)
+            print(3)
+            keyPoints = datum.poseKeypoints
+            print(3.5)
+            keyPointsList = [keyPoints[0][i][j] for i in range(25) for j in range(3)]
+            print(4)
+            resultTag = predictResult(keyPointsList)
+            self.label_13.setText(pos[resultTag])
             print(5)
             print(pos[resultTag])
         except TypeError as err:
