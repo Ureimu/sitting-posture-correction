@@ -49,7 +49,26 @@ def predictResult(datas=None) -> int:
     if datas is None:
         datas = []
 
-    predict = model(Variable(torch.Tensor([datas]).float())).detach().cpu().numpy().tolist()[0]
+    personData = torch.Tensor(datas).float().numpy().tolist()
+    # print(personData)
+    personX = personData[0:len(personData):3]
+    personY = personData[1:len(personData):3]
+    personConf = personData[2:len(personData):3]
+    filteredPersonCoordList = []
+    filteredPersonIndexList = []
+    for i in range(len(personConf)):
+        if personConf[i] != 0:
+            filteredPersonCoordList.append(personX[i])
+            filteredPersonCoordList.append(personY[i])
+            filteredPersonIndexList.append(i)
+    pMax = max(filteredPersonCoordList)
+    pMin = min(filteredPersonCoordList)
+    for i in filteredPersonIndexList:
+        personX[i] = (personX[i] - pMin) / (pMax - pMin)
+        personY[i] = (personY[i] - pMin) / (pMax - pMin)
+        personData[i * 3] = personX[i]
+        personData[i * 3 + 1] = personY[i]
+    predict = model(Variable(torch.Tensor([personData]).float())).detach().cpu().numpy().tolist()[0]
     predict = predict.index(max(predict))
 
     return predict

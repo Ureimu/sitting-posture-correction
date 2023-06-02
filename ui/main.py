@@ -137,13 +137,21 @@ class mWindow(QMainWindow, Ui_MainWindow):
     def openImage(self):
         imgPath, imgType = QFileDialog.getOpenFileName(self, "打开图片", "", "*.jpg;;*.png;;All Files(*)")
         print(imgPath, imgType)
-        jpg = QtGui.QPixmap(imgPath)
-        self.label_9.setPixmap(jpg)
-        self.predictFromImg(imgPath)
+        if imgPath == '':
+            return
+        img = cv2.imread(imgPath)
+        height, width, channel = img.shape
+        maxLen = max(height, width)
+        img = cv2.resize(img, (int(width / maxLen * 400), int(height / maxLen * 400)))
+        height, width, channel = img.shape
+        pixmap = QPixmap.fromImage(QImage(
+            img.data, width, height, 3 * width, QImage.Format_RGB888).rgbSwapped())
+        self.label_9.setPixmap(pixmap)
+        self.predictFromImg(img)
 
-    def predictFromImg(self, imgPath):
+    def predictFromImg(self, img):
         datum = op.Datum()
-        datum.cvInputData = cv2.imread(imgPath)  # 输入
+        datum.cvInputData = img  # 输入
         try:
             # print(frame)
             print(1)
@@ -152,8 +160,10 @@ class mWindow(QMainWindow, Ui_MainWindow):
             if datum.poseKeypoints is None:
                 print("no body")
                 self.label_13.setText("未识别到人体")
-                jpg = QtGui.QPixmap(imgPath)
-                self.label_10.setPixmap(jpg)
+                height, width, channel = img.shape
+                pixmap = QPixmap.fromImage(QImage(
+                    img.data, width, height, 3 * width, QImage.Format_RGB888).rgbSwapped())
+                self.label_10.setPixmap(pixmap)
                 return
             time_tuple = time.localtime(time.time())
             cv2.imwrite("./estimatedImgs/{}-{}-{}-{}-{}-{}.jpg".format(time_tuple[0], time_tuple[1], time_tuple[2], time_tuple[3],
